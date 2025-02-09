@@ -20,6 +20,12 @@ async def list_documents(user: User = Depends(current_user)):
 async def detail(document_id: UUID, user: User = Depends(current_user)):
   return await DocumentService.detail(user, document_id)
 
+@document_router.get('/{document_id}/download',
+                     summary='Download document by ID',
+                     response_model=DocumentDetail)
+async def detail(document_id: UUID, user: User = Depends(current_user)):
+  return await DocumentService.download(user, document_id)
+
 @document_router.post('/create',
                       summary='Add document',
                       response_model=DocumentDetail)

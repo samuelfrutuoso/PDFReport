@@ -10,7 +10,6 @@ class Template(Document):
   name: str = Indexed(str)
   description: Optional[str] = None
   owner: Link[User]
-  template_path: str # File zip
   bootstrap: Optional[bool] = False
   created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
   updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

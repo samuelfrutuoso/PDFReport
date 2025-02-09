@@ -19,6 +19,6 @@ class DocumentDetail(BaseModel):
   name: str
   description: str
   template_id: str
-  path: str
+  download_link: str
   created_at: datetime
   updated_at: datetime

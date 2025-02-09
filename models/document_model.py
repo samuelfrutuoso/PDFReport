@@ -3,6 +3,7 @@ from uuid import UUID, uuid4
 from pydantic import Field
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any
+from core.config import settings
 from .template_model import Template
 from .user_model import User
 
@@ -14,6 +15,7 @@ class Document(Document):
   owner: Link[User]
   path: str
   data: Dict[str, Any]
+  download_link: str
   created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
   updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -30,16 +32,7 @@ class Document(Document):
     if isinstance(other, Document):
       return self.document_id == other.document_id
     return False
-  
-  @before_event([Insert])
-  async def create_pdf(self):
-    self.path = f'/{self.owner.id}/{self.id}.pdf'
-    template = await Template.find_one(
-      Template.template_id == self.template_id,
-      Template.owner.id == self.owner.id
-      )
-    # TODO: Extract all from zip path and genereate PDF
 
-  @before_event([Replace])
+  @before_event([Insert, Replace])
   def sync_update_at(self):
     self.updated_at = datetime.now(timezone.utc)
