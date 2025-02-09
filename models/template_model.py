@@ -10,11 +10,13 @@ class Template(Document):
   name: str = Indexed(str)
   description: Optional[str] = None
   owner: Link[User]
-  # html: str
-  # css: str
-  # bootstrap: Optional[bool] = False
+  template_path: str # File zip
+  bootstrap: Optional[bool] = False
   created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
   updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+  class Settings:
+    collection = 'templates'
 
   def __repr__(self) -> str:
     return f'Template {self.name}'

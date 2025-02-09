@@ -1,22 +1,37 @@
-# from schemas.document_schema import DocumentSchema
-# from weasyprint import HTML
-# import os
-# from jinja2 import Environment, FileSystemLoader
+from typing import List
+from uuid import UUID
+from models.user_model import User
+from models.document_model import Document
+from schemas.document_schema import DocumentCreate, DocumentUpdate
 
-# TEMPLATES_DIR = "templates"
-# PDF_DIR = "generated_pdfs"
-
-# os.makedirs(TEMPLATES_DIR, exist_ok=True)
-# os.makedirs(PDF_DIR, exist_ok=True)
-# jinja_env = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
-
-# def get_pdf_path(document_id: UUID) -> str:
-#   return os.path.join(PDF_DIR, document_id, '.pdf')
-
-# class DocumentService:
-
-#   def create_pdf(self, pdf_request: DocumentSchema):
-#     template = jinja_env.get_template(pdf_request.template_name)
-#     html = template.render(pdf_request.data)
-#     file_path = get_pdf_path(pdf_request.pdf_id)
-#     HTML(string=html).write_pdf(file_path)
+class DocumentService:
+  @staticmethod
+  async def list_documents(user: User) -> List[Document]:
+    documents = await Document.find(Document.owner.id == user.id).to_list()
+    return documents
+  
+  @staticmethod
+  async def create_document(user: User, data: DocumentCreate) -> Document:
+    document = Document(**data.model_dump(), owner=user)
+    await document.insert()
+    return document
+  
+  @staticmethod
+  async def detail(user: User, document_id: UUID) -> Document | None:
+    document = await Document.find_one(Document.document_id == document_id, Document.owner.id == user.id)
+    return document
+  
+  @staticmethod
+  async def update_document(user: User, document_id: UUID, data: DocumentUpdate) -> Document:
+    document = await DocumentService.detail(user, document_id)
+    await document.update({
+      '$set': data.model_dump(exclude_unset=True)
+    })
+    await document.save()
+    return document
+  
+  @staticmethod
+  async def delete_document(user: User, document_id: UUID) -> None:
+    document = await DocumentService.detail(user, document_id)
+    if document:
+      await document.delete()

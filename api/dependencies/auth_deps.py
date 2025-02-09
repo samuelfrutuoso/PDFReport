@@ -3,9 +3,11 @@ from fastapi import Depends, HTTPException, status
 from models.user_model import User
 from jose import jwt
 from core.config import settings
+from core.security import verify_password
 from schemas.auth_schema import TokenPayload
 from datetime import datetime
 from pydantic import ValidationError
+from typing import Optional
 from services.user_service import UserService
 
 oauth_reusavel = OAuth2PasswordBearer(
@@ -15,7 +17,20 @@ oauth_reusavel = OAuth2PasswordBearer(
 
 auth_header = {'WWW-Authenticate': 'Bearer'}
 
-async def get_current_user(token: str = Depends(oauth_reusavel)) -> User:
+async def authenticate(email: str, password: str) -> Optional[User]:
+  user = await UserService.get_user_by_email(email=email)
+  
+  if not user:
+    return None
+  if not verify_password(
+    password=password,
+    hashed_password=user.hash_password
+  ):
+    return None
+  
+  return user
+
+async def current_user(token: str = Depends(oauth_reusavel)) -> User:
   try:
     payload = jwt.decode(
       token,

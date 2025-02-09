@@ -1,5 +1,6 @@
 # PDFReport
 
 ``shell
-fastapi dev main.py
+.\.venv\Scripts\activate
+fastapi dev app.py
 ``

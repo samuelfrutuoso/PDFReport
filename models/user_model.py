@@ -12,6 +12,9 @@ class User(Document):
   name: Optional[str] = None
   desabled: Optional[str] = None
 
+  class Settings:
+    collection = 'users'
+
   def __repr__(self):
     return f'User {self.email}'
   
