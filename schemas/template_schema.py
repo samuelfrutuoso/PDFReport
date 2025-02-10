@@ -17,6 +17,8 @@ class TemplateSummary(BaseModel):
   template_id: UUID
   name: str
   description: str
+  file_uploaded: bool
+  bootstrap: bool
   created_at: datetime
   updated_at: datetime
 
@@ -24,6 +26,7 @@ class TemplateDetail(BaseModel):
   template_id: UUID
   name: str
   description: str
+  file_uploaded: bool
   bootstrap: bool
   created_at: datetime
   updated_at: datetime

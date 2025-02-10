@@ -6,12 +6,8 @@ from schemas.document_schema import DocumentCreate, DocumentUpdate
 from models.document_model import Template
 from core.config import settings
 from fastapi import Depends, HTTPException, status
-import os.path
 
-async def create_pdf(user_id: str, template_id: str, document_id: str, data: object):
-  document_path = settings.DOCUMENTS_DIR / f'/{document_id}.pdf'
-  download_link = f'/{settings.API_V1_STR}/documents/{document_id}/download'
-  # TODO: Extract all from zip path and genereate PDF
+get_document_path = lambda document_id: settings.DOCUMENTS_DIR / f'{document_id}.pdf'
 
 class DocumentService:
   @staticmethod
@@ -22,8 +18,12 @@ class DocumentService:
   @staticmethod
   async def create_document(user: User, data: DocumentCreate) -> Document:
     document = Document(**data.model_dump(), owner=user)
+    
+    document_path = get_document_path(document.id)
+    document.download_link = f'/{settings.API_V1_STR}/documents/{document.id}/download'
+    # TODO: Extract all from zip path and genereate PDF
+
     await document.insert()
-    await create_pdf(user.id, document.template_id, document.id, data.data)
     return document
   
   @staticmethod
@@ -35,19 +35,15 @@ class DocumentService:
   @staticmethod
   async def download(user: User, document_id: UUID):
     document = await DocumentService.detail(user, document_id)
-    if not document:
-      raise HTTPException(
-        status.HTTP_404_NOT_FOUND,
-        detail='File not found',
-        headers=settings.HTTP_AUTH_HEADER
-      )
     document_path = settings.DOCUMENTS_DIR / f'{document_id}.pdf'
-    if not os.path.isfile(document_path):
+
+    if not document or not document_path.is_file():
       raise HTTPException(
         status.HTTP_404_NOT_FOUND,
         detail='File not found',
         headers=settings.HTTP_AUTH_HEADER
       )
+    # TODO
   
   @staticmethod
   async def update_document(user: User, document_id: UUID, data: DocumentUpdate) -> Document:

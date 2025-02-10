@@ -31,9 +31,3 @@ async def login(data: OAuth2PasswordRequestForm = Depends()) -> Any:
   )
 
   return token
-
-@auth_router.post('/test-token',
-                  summary='Token testing',
-                  response_model=UserDetail)
-async def test_token(user: User = Depends(current_user)):
-  return user

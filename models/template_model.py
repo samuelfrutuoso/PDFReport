@@ -11,6 +11,7 @@ class Template(Document):
   description: Optional[str] = None
   owner: Link[User]
   bootstrap: Optional[bool] = False
+  file_uploaded: Optional[bool] = False
   created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
   updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 

@@ -9,6 +9,7 @@ from datetime import datetime
 from pydantic import ValidationError
 from typing import Optional
 from services.user_service import UserService
+from typing import Annotated
 
 oauth_reusavel = OAuth2PasswordBearer(
   tokenUrl=f'{settings.API_V1_STR}/auth/login',
@@ -28,7 +29,7 @@ async def authenticate(email: str, password: str) -> Optional[User]:
   
   return user
 
-async def current_user(token: str = Depends(oauth_reusavel)) -> User:
+async def current_user(token: Annotated[str, Depends(oauth_reusavel)]) -> User:
   try:
     payload = jwt.decode(
       token,
