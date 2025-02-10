@@ -5,6 +5,8 @@ from models.document_model import Document
 from schemas.document_schema import DocumentCreate, DocumentUpdate
 from models.document_model import Template
 from core.config import settings
+from fastapi import Depends, HTTPException, status
+import os.path
 
 async def create_pdf(user_id: str, template_id: str, document_id: str, data: object):
   document_path = settings.DOCUMENTS_DIR / f'/{document_id}.pdf'
@@ -32,7 +34,20 @@ class DocumentService:
   # TODO: Download document
   @staticmethod
   async def download(user: User, document_id: UUID):
-    pass
+    document = await DocumentService.detail(user, document_id)
+    if not document:
+      raise HTTPException(
+        status.HTTP_404_NOT_FOUND,
+        detail='File not found',
+        headers=settings.HTTP_AUTH_HEADER
+      )
+    document_path = settings.DOCUMENTS_DIR / f'{document_id}.pdf'
+    if not os.path.isfile(document_path):
+      raise HTTPException(
+        status.HTTP_404_NOT_FOUND,
+        detail='File not found',
+        headers=settings.HTTP_AUTH_HEADER
+      )
   
   @staticmethod
   async def update_document(user: User, document_id: UUID, data: DocumentUpdate) -> Document:

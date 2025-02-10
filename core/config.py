@@ -11,11 +11,12 @@ class Settings(BaseSettings):
   ALGORITHM: str = 'HS256'
   ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
   ACCESS_TOKEN_REFRESH_MINUTES: int = 60 * 24 * 7
-  BACKEND_CORS_ORIGNS: List[AnyHttpUrl] = []
+  BACKEND_CORS_ORIGNS: List[AnyHttpUrl] = [] # List of IP Address accepted to connect
   PROJECT_NAME: str = 'PDFReport'
   BASE_DIR: Path = Path(__file__).resolve().parent.parent
   TEMPLATES_DIR: Path = BASE_DIR / 'writable' / 'templates'
   DOCUMENTS_DIR: Path = BASE_DIR / 'writable' / 'documents'
+  HTTP_AUTH_HEADER: dict[str, str] = {'WWW-Authenticate': 'Bearer'}
 
   # Database
   MONGO_CONNECTION_STRING: str = config('MONGO_CONNECTION_STRING', cast=str)

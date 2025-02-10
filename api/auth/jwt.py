@@ -6,7 +6,7 @@ from core.security import create_access_token, create_refresh_token
 from schemas.auth_schema import TokenSchema
 from schemas.user_schema import UserDetail
 from models.user_model import User
-from api.dependencies.auth_deps import current_user
+from api.dependencies.auth_deps import current_user, authenticate
 
 auth_router = APIRouter()
 
@@ -14,7 +14,7 @@ auth_router = APIRouter()
                   summary='Create Access Token and Refresh Token',
                   response_model=TokenSchema)
 async def login(data: OAuth2PasswordRequestForm = Depends()) -> Any:
-  user = await UserService.authenticate(
+  user = await authenticate(
     email=data.username,
     password=data.password
   )

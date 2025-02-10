@@ -15,8 +15,6 @@ oauth_reusavel = OAuth2PasswordBearer(
   scheme_name='JWT'
 )
 
-auth_header = {'WWW-Authenticate': 'Bearer'}
-
 async def authenticate(email: str, password: str) -> Optional[User]:
   user = await UserService.get_user_by_email(email=email)
   
@@ -44,14 +42,14 @@ async def current_user(token: str = Depends(oauth_reusavel)) -> User:
       raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail='Expired token',
-        headers=auth_header
+        headers=settings.HTTP_AUTH_HEADER
       )
 
   except(jwt.JWTError, ValidationError):
     raise HTTPException(
       status_code=status.HTTP_403_FORBIDDEN,
       detail='Error in token validation',
-      headers=auth_header
+      headers=settings.HTTP_AUTH_HEADER
     )
   
   user = await UserService.get_user_by_id(token_data.sub)
@@ -60,7 +58,7 @@ async def current_user(token: str = Depends(oauth_reusavel)) -> User:
     raise HTTPException(
       status_code=status.HTTP_404_NOT_FOUND,
       detail='User not found',
-      headers=auth_header
+      headers=settings.HTTP_AUTH_HEADER
     )
   
   return user
