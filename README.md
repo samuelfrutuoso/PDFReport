@@ -1,4 +1,6 @@
-# PDF Generation Service
+# PDFReport
+
+***PDF Generation Service***
 
 ## Overview
 
@@ -35,14 +37,14 @@ This project is a FastAPI-based microservice for generating PDFs from dynamic HT
 
    ```sh
    git clone https://github.com/samuelfrutuoso/PDFReport.git
-   cd PDFReport
+   cd F
    ```
 
 2. Create a virtual environment:
 
    ```sh
    python -m venv venv
-   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   source venv/bin/activate  # On Windows use `.\.venv\Scripts\activate`
    ```
 
 3. Install dependencies:
@@ -51,7 +53,7 @@ This project is a FastAPI-based microservice for generating PDFs from dynamic HT
    pip install -r requirements.txt
    ```
 
-4. Run the FastAPI application:
+4. Run the application:
 
    ```sh
    fastapi dev app.py
@@ -65,12 +67,12 @@ This project is a FastAPI-based microservice for generating PDFs from dynamic HT
 
 - Create Exceptions
 - Create logs
-- *document_service.create_document()*: Extract all from zip path and genereate PDF
-- *document_service.download()*: Download PDF
 - *config.Settings.BACKEND_CORS_ORIGNS*: Load values from *.ini*
-- *template_service.upload_template*: Add content check (only index.html, images and css)
-- *template_service.TemplateService.upload_template()*: Add Upload to cloud services  (also to documents)
-- *template_service.TemplateService.delete_template()*: Add delete from cloud services (also to documents)
+- *template_service*: Add Upload and delete to cloud services  (also to documents)
+- Internationalization
+- Password recovering
+- Create Docker File
+- Faker data generetor
 
 ## Contributing
 

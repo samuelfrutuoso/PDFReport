@@ -11,11 +11,11 @@ class Document(Document):
   document_id: UUID = Field(default_factory=uuid4, unique=True)
   name: str = Indexed(str, unique=True)
   description: Optional[str] = None
-  template_id: Link[Template]
+  template: Link[Template]
   owner: Link[User]
   path: str
   data: Dict[str, Any]
-  download_link: str
+  # download_link: str
   created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
   updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 

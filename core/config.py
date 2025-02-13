@@ -16,10 +16,13 @@ class Settings(BaseSettings):
   BASE_DIR: Path = Path(__file__).resolve().parent.parent
   TEMPLATES_DIR: Path = BASE_DIR / 'writable' / 'templates'
   DOCUMENTS_DIR: Path = BASE_DIR / 'writable' / 'documents'
+  TEMP_DIR: Path = BASE_DIR / 'temp'
   HTTP_AUTH_HEADER: dict[str, str] = {'WWW-Authenticate': 'Bearer'}
 
   # Database
   MONGO_CONNECTION_STRING: str = config('MONGO_CONNECTION_STRING', cast=str)
+
+  TEMPLATE_ACCEPTED_EXTENSIONS: tuple[str] = ('index.html', '.jpg', '.jpeg', '.png', '.svg', '.css')
 
   class Config:
     case_sensitive = True
@@ -28,5 +31,6 @@ class Settings(BaseSettings):
     BaseSettings.__init__(self)
     self.TEMPLATES_DIR.mkdir(parents=True, exist_ok=True)
     self.DOCUMENTS_DIR.mkdir(parents=True, exist_ok=True)
+    self.TEMP_DIR.mkdir(exist_ok=True)
 
 settings = Settings()

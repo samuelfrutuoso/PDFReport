@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi.responses import FileResponse
 from typing import List, Annotated
 from uuid import UUID
 from api.dependencies.auth_deps import current_user
@@ -24,9 +25,14 @@ async def detail(document_id: UUID,
 @document_router.get('/{document_id}/download',
                      summary='Download document by ID',
                      response_model=DocumentDetail)
-async def detail(document_id: UUID,
+async def download(document_id: UUID,
                  user: Annotated[User, Depends(current_user)]):
-  return await DocumentService.download(user, document_id)
+  file = await DocumentService.download(user, document_id)
+  return FileResponse(
+    path=file.path,
+    filename=file.name,
+    media_type='application/pdf'
+  )
 
 @document_router.post('/create',
                       summary='Add document',

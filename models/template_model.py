@@ -22,7 +22,7 @@ class Template(Document):
     return f'Template {self.name}'
   
   def __str__(self) -> str:
-    return self.name
+    return self.template_id
   
   def __hash__(self) -> int:
     return hash(self.name)

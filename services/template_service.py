@@ -7,25 +7,26 @@ from uuid import UUID
 import shutil
 from core.config import settings
 import asyncio
+from zipfile import ZipFile
 
-get_template_path = lambda template_id: settings.TEMPLATES_DIR / f'{template_id}.zip'
+get_template_path = lambda template: settings.TEMPLATES_DIR / f'{template.id}'
 
 class TemplateService:
   @staticmethod
   async def list_services(user: User) -> List[Template]:
-    templates = await Template.find(Template.owner.id == user.id).to_list()
+    templates = await Template.find(Template.owner.ref.id == user.id).to_list()
     return templates
   
   @staticmethod
   async def create_template(user: User, data: TemplateCreate) -> Template:
     template = Template(**data.model_dump(), owner=user)
     await template.insert()
-    asyncio.create_task(TemplateService.cancel_template(user.user_id, template.template_id, 300))
+    asyncio.create_task(TemplateService.cancel_template(user, template.template_id, 300))
     return template
   
   @staticmethod
   async def detail(user: User, template_id: UUID) -> Template | None:
-    template = await Template.find_one(Template.template_id == template_id, Template.owner.id == user.id)
+    template = await Template.find_one(Template.template_id == template_id, Template.owner.ref.id == user.id)
     return template
   
   @staticmethod
@@ -37,7 +38,6 @@ class TemplateService:
     await template.save()
     return template
   
-  # TODO: Add content check: only index.html, images and css
   # TODO: Add Upload to AWS S3 and others
   @staticmethod
   async def upload_template(user: User, template_id: UUID, file: UploadFile):
@@ -49,27 +49,53 @@ class TemplateService:
         headers=settings.HTTP_AUTH_HEADER
       )
     
-    template_path = get_template_path(template_id)
-    with open(template_path, 'wb') as buffer:
-      shutil.copyfileobj(file.file, buffer)
+    try:
+      temp_file = settings.TEMP_DIR / f'{template.id}.zip'
+
+      # Save the zip file on temp folder
+      with open(temp_file, 'wb') as buffer:
+        shutil.copyfileobj(file.file, buffer)
+      
+      with ZipFile(temp_file) as temp_zip:
+        # Check structure
+        for filename in temp_zip.namelist():
+          if not filename.endswith(settings.TEMPLATE_ACCEPTED_EXTENSIONS):
+            raise HTTPException(
+              status_code=status.HTTP_400_BAD_REQUEST,
+              detail='Wrong template structure',
+              headers=settings.HTTP_AUTH_HEADER
+            )
+       
+       # Extract all files
+        template_path = get_template_path(template.id)
+        if template_path.exists():
+          template_path.unlink()
+        
+        template_path.mkdir()
+        temp_zip.extractall(template_path)
     
-    template.file_uploaded = True
-    template.save()
+    except Exception:
+      raise
+    else:
+      template.file_uploaded = True
+      template.save()
+    finally:
+      temp_file.unlink()
   
   @staticmethod
   async def delete_template(user: User, template_id: UUID) -> None:
     template = await TemplateService.detail(user, template_id)
     if template:
-      await template.delete()
       # TODO: Add delete from AWS S3 and others
-      template_path = get_template_path(template_id)
+      template_path = get_template_path(template.id)
       template_path.unlink(missing_ok=True)
+      await template.delete()
   
   @staticmethod
-  async def cancel_template(user_id: UUID, template_id: UUID, delay: int) -> None:
+  async def cancel_template(user: User, template_id: UUID, delay: int) -> None:
     await asyncio.sleep(delay)
 
-    template = await TemplateService.detail(user_id, template_id)
+    template = await TemplateService.detail(user, template_id)
     
     if template and not template.file_uploaded:
       template.delete()

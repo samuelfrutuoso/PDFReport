@@ -6,19 +6,19 @@ from datetime import datetime
 class DocumentCreate(BaseModel):
   name: str = Field(..., title='Name', min_length=3, max_length=50)
   description: str = Field(..., title='Description', min_length=3, max_length=125)
-  template_id: UUID = Field(..., title='Template ID')
+  template: UUID = Field(..., title='Template ID')
   data: Json[Any] = Field(..., title='Data')
 
 class DocumentUpdate(BaseModel):
   name: Optional[str]
   description: Optional[str]
-  template_id: Optional[str]
+  template: Optional[str]
 
 class DocumentDetail(BaseModel):
   document_id: UUID
   name: str
   description: str
-  template_id: str
-  download_link: str
+  template: str
+  # download_link: str
   created_at: datetime
   updated_at: datetime
