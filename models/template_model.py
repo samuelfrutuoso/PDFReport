@@ -12,6 +12,7 @@ class Template(Document):
   owner: Link[User]
   bootstrap: Optional[bool] = False
   file_uploaded: Optional[bool] = False
+  faker_model: Optional[dict] = None
   created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
   updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 

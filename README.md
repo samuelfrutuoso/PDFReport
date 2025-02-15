@@ -65,14 +65,14 @@ This project is a FastAPI-based microservice for generating PDFs from dynamic HT
 
 ## TODO List (Pending Tasks)
 
-- Create Exceptions
+- Create Exceptions in all endpoints
 - Create logs
 - *config.Settings.BACKEND_CORS_ORIGNS*: Load values from *.ini*
-- *template_service*: Add Upload and delete to cloud services  (also to documents)
+- Add Upload and delete files to cloud services  (templates and documents)
 - Internationalization
 - Password recovering
 - Create Docker File
-- Faker data generetor
+- Comment functions
 
 ## Contributing
 

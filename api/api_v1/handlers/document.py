@@ -35,11 +35,18 @@ async def download(document_id: UUID,
   )
 
 @document_router.post('/create',
-                      summary='Add document',
+                      summary='Create new PDF document',
                       response_model=DocumentDetail)
 async def create_template(data: DocumentCreate,
                           user: Annotated[User, Depends(current_user)]):
   return await DocumentService.create_document(user, data)
+
+@document_router.post('/test',
+                      summary='Create faker document',
+                      response_model=DocumentDetail)
+async def create_template(template_id: UUID,
+                          user: Annotated[User, Depends(current_user)]):
+  return await DocumentService.test(user, template_id)
 
 @document_router.put('/{document_id}',
                      summary='Update document',
